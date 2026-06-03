@@ -18,7 +18,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         phone=user.phone,
         flat=user.flat,
         role=user.role,
-        password_hash=hash_password(user.password)
+        password_hash=hash_password(user.password[:72])
     )
     db.add(new_user)
     db.commit()
