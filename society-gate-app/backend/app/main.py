@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from app.db import engine, get_db
 from app.core.security import create_token, verify_token
-from app.services.whatsapp import send_approval
+
 from app.services.redis_service import set_status, get_status
 from app.routers import visitors, auth
 
