@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
@@ -20,7 +20,7 @@ class VisitorOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserCreate(BaseModel):
@@ -28,12 +28,12 @@ class UserCreate(BaseModel):
     phone: str
     flat: str
     role: str = "resident"
-    password: str
+    password: str = Field(..., max_length=72)
 
 
 class UserLogin(BaseModel):
     phone: str
-    password: str
+    password: str = Field(..., max_length=72)
 
 
 class TokenOut(BaseModel):
