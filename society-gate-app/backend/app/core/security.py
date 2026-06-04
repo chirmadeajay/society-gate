@@ -5,18 +5,17 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import os
 
-SECRET = os.getenv("JWT_SECRET", "super-secret-key-change-in-production")
+SECRET = os.getenv("JWT_SECRET", "super-secret-key")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 12
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def create_token(user_id: int) -> str:
     payload = {
         "user_id": user_id,
-        "exp": datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+        "exp": datetime.utcnow() + timedelta(hours=12)
     }
     return jwt.encode(payload, SECRET, algorithm=ALGORITHM)
 
@@ -26,15 +25,14 @@ def verify_token(token: str = Depends(oauth2_scheme)) -> int:
         payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
         return payload["user_id"]
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password[:72])
+    p = password[:72] if len(password) > 72 else password
+    return pwd_context.hash(p)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain[:72], hashed)
+    p = plain[:72] if len(plain) > 72 else plain
+    return pwd_context.verify(p, hashed)
