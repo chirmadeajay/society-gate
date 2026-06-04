@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import models, schemas
 from app.db import get_db
-from app.core.security import create_token, hash_password, verify_password
+from app.core.security import create_token, hash_password, verify_password, verify_token
 import traceback
 
 router = APIRouter()
