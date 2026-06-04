@@ -44,3 +44,25 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/update-resident/{flat}")
+def update_resident(flat: str, name: str, phone: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.flat == flat).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Resident not found")
+    user.name = name
+    user.phone = phone
+    db.commit()
+    return {"message": f"Resident in flat {flat} updated successfully"}
+
+
+@router.put("/update-resident/{flat}")
+def update_resident(flat: str, name: str, phone: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.flat == flat).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Resident not found")
+    user.name = name
+    user.phone = phone
+    db.commit()
+    return {"message": f"Resident in flat {flat} updated successfully"}
