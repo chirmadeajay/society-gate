@@ -4,12 +4,10 @@
     "slug": "society-gate-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "backgroundColor": "#1a1a2e"
     },
-    "assetBundlePatterns": ["**/*"],
     "android": {
       "package": "com.ajaychirmade.societygatemobile",
       "adaptiveIcon": {
