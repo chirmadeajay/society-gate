@@ -62,3 +62,10 @@ def get_visitor(visitor_id: int, db: Session = Depends(get_db)):
     if not visitor:
         raise HTTPException(status_code=404, detail="Visitor not found")
     return visitor
+
+
+@router.delete("/clear-all")
+def clear_all_visitors(db: Session = Depends(get_db)):
+    deleted = db.query(models.Visitor).delete()
+    db.commit()
+    return {"message": f"Deleted {deleted} visitors"}
