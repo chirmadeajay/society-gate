@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from app.db import get_db
 from app.core.security import create_token, hash_password, verify_password, verify_token
-import traceback
 
 router = APIRouter()
 
@@ -14,7 +13,6 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         existing = db.query(models.User).filter(models.User.phone == user.phone).first()
         if existing:
             raise HTTPException(status_code=400, detail="Phone already registered")
-
         pw = user.password[:72]
         new_user = models.User(
             name=user.name,
@@ -55,34 +53,6 @@ def update_resident(flat: str, name: str, phone: str, db: Session = Depends(get_
     user.phone = phone
     db.commit()
     return {"message": f"Resident in flat {flat} updated successfully"}
-
-
-@router.put("/update-resident/{flat}")
-def update_resident(flat: str, name: str, phone: str, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.flat == flat).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Resident not found")
-    user.name = name
-    user.phone = phone
-    db.commit()
-    return {"message": f"Resident in flat {flat} updated successfully"}
-
-
-@router.get("/me")
-def get_me(db: Session = Depends(get_db), user_id: int = Depends(verify_token)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"id": user.id, "name": user.name, "phone": user.phone, "flat": user.flat, "role": user.role}
-
-
-@router.post("/push-token")
-def save_push_token(data: dict, db: Session = Depends(get_db), user_id: int = Depends(verify_token)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if user:
-        user.push_token = data.get("push_token")
-        db.commit()
-    return {"message": "Push token saved"}
 
 
 @router.get("/me")
