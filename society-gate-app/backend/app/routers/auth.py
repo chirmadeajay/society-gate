@@ -61,3 +61,10 @@ def get_me(db: Session = Depends(get_db), user_id: int = Depends(verify_token)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"id": user.id, "name": user.name, "phone": user.phone, "flat": user.flat, "role": user.role}
+
+
+@router.delete("/clear-all-residents")
+def clear_all_residents(db: Session = Depends(get_db)):
+    deleted = db.query(models.User).delete()
+    db.commit()
+    return {"message": f"Deleted {deleted} users"}
