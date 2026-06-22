@@ -21,12 +21,10 @@ def add_visitor(visitor: schemas.VisitorCreate, db: Session = Depends(get_db), u
     db.add(new_visitor)
     db.commit()
     db.refresh(new_visitor)
-
     resident = db.query(models.User).filter(
         models.User.flat == visitor.flat,
         models.User.role == "resident"
     ).first()
-
     if resident:
         phone = resident.phone
         if not phone.startswith('+'):
@@ -37,8 +35,14 @@ def add_visitor(visitor: schemas.VisitorCreate, db: Session = Depends(get_db), u
             visitor_name=new_visitor.name,
             flat=new_visitor.flat
         )
-
     return new_visitor
+
+
+@router.delete("/clear-all")
+def clear_all_visitors(db: Session = Depends(get_db)):
+    deleted = db.query(models.Visitor).delete()
+    db.commit()
+    return {"message": f"Deleted {deleted} visitors"}
 
 
 @router.post("/{visitor_id}/face")
@@ -62,10 +66,3 @@ def get_visitor(visitor_id: int, db: Session = Depends(get_db)):
     if not visitor:
         raise HTTPException(status_code=404, detail="Visitor not found")
     return visitor
-
-
-@router.delete("/clear-all")
-def clear_all_visitors(db: Session = Depends(get_db)):
-    deleted = db.query(models.Visitor).delete()
-    db.commit()
-    return {"message": f"Deleted {deleted} visitors"}
